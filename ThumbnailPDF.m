@@ -8,27 +8,55 @@
 
 #import "ThumbnailPDF.h"
 
-
 @implementation ThumbnailPDF
 
-@synthesize sURL = _sURL;
-@synthesize dataFile = _dataFile;
 
-
--(id)initWithURLPDF:(NSString *)sURL {
+CGImageRef CreateThumbnailFromData (NSData *data, int imageSize) {
     
-    return self;
-}
--(id)initWithDataPDF:(NSData *)data {
-    self = [super init];
-    if (self) {
-        CreateThumbnailPDFFromData(data, 0);
+    CGImageRef myThumbnailImage = NULL;
+    CGImageSourceRef myImageSource;
+    CFStringRef   myKeys[3];
+    CFDictionaryRef myOptions = NULL;
+    CFTypeRef     myValues[3];
+    
+    CFNumberRef   thumbnailSize;
+    
+    myImageSource = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
+    
+    if (myImageSource == NULL) {
+        fprintf(stderr, "Image Source is NULL");
     }
     
+    thumbnailSize = CFNumberCreate(NULL, kCFNumberIntType, &imageSize);
     
-    return self;
-}
-CGImageRef CreateThumbnailPDFFromData (NSData *data, int imageSize) {
+    myKeys[0] = kCGImageSourceCreateThumbnailWithTransform;
+    myValues[0] = (CFTypeRef)kCFBooleanTrue;
+    myKeys[1] = kCGImageSourceCreateThumbnailFromImageIfAbsent;
+    myValues[1] = (CFTypeRef)kCFBooleanTrue;
+    myKeys[2] = kCGImageSourceThumbnailMaxPixelSize;
+    myValues[2] = (CFTypeRef)thumbnailSize;
     
+    myOptions = CFDictionaryCreate(NULL, (const void **) myKeys,
+                                   (const void **) myValues, 2,
+                                   &kCFTypeDictionaryKeyCallBacks,
+                                   & kCFTypeDictionaryValueCallBacks);
+    // Create the thumbnail image using the specified options.
+    myThumbnailImage = CGImageSourceCreateThumbnailAtIndex(myImageSource,
+                                                           0,
+                                                           myOptions);
+    // Release the options dictionary and the image source
+    // when you no longer need them.
+    CFRelease(thumbnailSize);
+    CFRelease(myOptions);
+    CFRelease(myImageSource);
+    // Make sure the thumbnail image exists before continuing.
+    
+    if (!myThumbnailImage) {
+        fprintf(stderr, "Thumbnail image not created from image source.");
+    }
+    
+    return myThumbnailImage;
 }
+
+
 @end

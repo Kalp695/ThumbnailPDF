@@ -9,17 +9,18 @@
 #import <Foundation/Foundation.h>
 #import <ImageIO/ImageIO.h>
 
-@interface ThumbnailPDF : NSObject {
-    NSString *sURL;
-    NSData   *dataFile;
-}
+@interface ThumbnailPDF : NSObject
 
-@property (nonatomic, retain) NSURL *sURL;
-@property (nonatomic, retain) NSData *dataFile;
+#pragma Properties
+
+@property (nonatomic, strong) NSURL  *baseURL;
 
 
--(id)initWithURLPDF:(NSString *)sURL;
--(id)initWithDataPDF:(NSData*)dataFile;
+@property (nonatomic, strong) NSData *dataPdf;
+
+
+//Create thumbnail from a NSData with param imageSize
+CGImageRef CreateThumbnailFromData(NSData *data, int imageSize);
 
 
 @end
