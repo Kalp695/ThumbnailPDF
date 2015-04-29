@@ -24,11 +24,9 @@
     
     NSString *path = [[NSBundle mainBundle] pathForResource:@"Multipeer_Connectivity" ofType:@"pdf"];
     NSData *data = [NSData dataWithContentsOfFile:path];
-    
-    _imageView.image = [UIImage imageWithCGImage:CreateThumbnailFromData(data, 400)];
-    
-    
-    
+  
+    ThumbnailPDF *thumbPDF = [[ThumbnailPDF alloc] init];
+    _imageView.image = [UIImage imageWithCGImage:[thumbPDF thumbnailFromData:data andSize:500 andPageIndex:0]];
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

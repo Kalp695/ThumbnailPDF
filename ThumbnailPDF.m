@@ -10,9 +10,20 @@
 
 @implementation ThumbnailPDF
 
-
-CGImageRef CreateThumbnailFromData (NSData *data, int imageSize) {
-    
+-(id)init {
+    if (self = [super init]) {
+        _data = [[NSData alloc] init];
+        _imageSize = 0;
+        _indexPage = 0;
+    }
+    return self;
+}
+-(CGImageRef)thumbnailFromData:(NSData *)data andSize:(int)size andPageIndex:(int)indexPage {
+    _indexPage = indexPage;
+    return [self thumbnailFromData:data andSize:size];
+}
+-(CGImageRef)thumbnailFromData:(NSData *)data andSize:(int)size {
+   
     CGImageRef myThumbnailImage = NULL;
     CGImageSourceRef myImageSource;
     CFStringRef   myKeys[3];
@@ -21,13 +32,16 @@ CGImageRef CreateThumbnailFromData (NSData *data, int imageSize) {
     
     CFNumberRef   thumbnailSize;
     
-    myImageSource = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
+    self.data       = data;
+    self.imageSize  = size;
+    
+    myImageSource = CGImageSourceCreateWithData((__bridge CFDataRef)self.data, NULL);
     
     if (myImageSource == NULL) {
         fprintf(stderr, "Image Source is NULL");
     }
     
-    thumbnailSize = CFNumberCreate(NULL, kCFNumberIntType, &imageSize);
+    thumbnailSize = CFNumberCreate(NULL, kCFNumberIntType, &size);
     
     myKeys[0] = kCGImageSourceCreateThumbnailWithTransform;
     myValues[0] = (CFTypeRef)kCFBooleanTrue;
@@ -41,8 +55,14 @@ CGImageRef CreateThumbnailFromData (NSData *data, int imageSize) {
                                    &kCFTypeDictionaryKeyCallBacks,
                                    & kCFTypeDictionaryValueCallBacks);
     // Create the thumbnail image using the specified options.
+
+    size_t totalPages = CGImageSourceGetCount(myImageSource);
+    if (_indexPage < 0 || _indexPage > totalPages) {
+        fprintf(stderr, "Thumbnail not created because indexPage it's not valid.\n");
+    }
+    
     myThumbnailImage = CGImageSourceCreateThumbnailAtIndex(myImageSource,
-                                                           0,
+                                                           _indexPage,
                                                            myOptions);
     // Release the options dictionary and the image source
     // when you no longer need them.
@@ -50,13 +70,10 @@ CGImageRef CreateThumbnailFromData (NSData *data, int imageSize) {
     CFRelease(myOptions);
     CFRelease(myImageSource);
     // Make sure the thumbnail image exists before continuing.
-    
     if (!myThumbnailImage) {
         fprintf(stderr, "Thumbnail image not created from image source.");
     }
-    
+
     return myThumbnailImage;
 }
-
-
 @end

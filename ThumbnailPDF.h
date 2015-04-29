@@ -11,16 +11,17 @@
 
 @interface ThumbnailPDF : NSObject
 
-#pragma Properties
+-(id)init;
 
 @property (nonatomic, strong) NSURL  *baseURL;
+@property (nonatomic, strong) NSData *data;
+@property (nonatomic, assign) int     imageSize;
+@property (nonatomic, assign) int     indexPage;
 
 
-@property (nonatomic, strong) NSData *dataPdf;
+-(CGImageRef)thumbnailFromData:(NSData *)data andSize:(int)size;
+-(CGImageRef)thumbnailFromData:(NSData *)data andSize:(int)size andPageIndex:(int)indexPage;
 
-
-//Create thumbnail from a NSData with param imageSize
-CGImageRef CreateThumbnailFromData(NSData *data, int imageSize);
-
+//-(CGImageRef)thumbnailFroURL:(NSURL *)URL andSize:(int)size andPageIndex:(int)indexPage;
 
 @end
