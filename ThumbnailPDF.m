@@ -20,11 +20,26 @@
 }
 -(CGImageRef)thumbnailFromData:(NSData *)data andSize:(int)size andPageIndex:(int)indexPage {
     _indexPage = indexPage;
+    
     return [self thumbnailFromData:data andSize:size];
+}
+-(void)startWithCompletionHandler:(NSData *)data andSize:(int)size completion:(completionHandler)completionHandler {
+  
+    dispatch_queue_t block = dispatch_queue_create("com.br.ThumbnailPDF", NULL);
+    dispatch_async(block, ^{
+        
+        [self thumbnailFromData:data andSize:size];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(self , YES);
+
+        });
+    });
+
 }
 -(CGImageRef)thumbnailFromData:(NSData *)data andSize:(int)size {
    
-    CGImageRef myThumbnailImage = NULL;
+    _myThumbnailImage = NULL;
     CGImageSourceRef myImageSource;
     CFStringRef   myKeys[3];
     CFDictionaryRef myOptions = NULL;
@@ -55,13 +70,13 @@
                                    &kCFTypeDictionaryKeyCallBacks,
                                    & kCFTypeDictionaryValueCallBacks);
     // Create the thumbnail image using the specified options.
-
+    
     size_t totalPages = CGImageSourceGetCount(myImageSource);
     if (_indexPage < 0 || _indexPage > totalPages) {
         fprintf(stderr, "Thumbnail not created because indexPage it's not valid.\n");
     }
     
-    myThumbnailImage = CGImageSourceCreateThumbnailAtIndex(myImageSource,
+    _myThumbnailImage = CGImageSourceCreateThumbnailAtIndex(myImageSource,
                                                            _indexPage,
                                                            myOptions);
     // Release the options dictionary and the image source
@@ -70,10 +85,11 @@
     CFRelease(myOptions);
     CFRelease(myImageSource);
     // Make sure the thumbnail image exists before continuing.
-    if (!myThumbnailImage) {
+    if (!_myThumbnailImage) {
         fprintf(stderr, "Thumbnail image not created from image source.");
     }
-
-    return myThumbnailImage;
+    
+    return _myThumbnailImage;
 }
+
 @end

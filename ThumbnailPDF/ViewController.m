@@ -26,7 +26,11 @@
     NSData *data = [NSData dataWithContentsOfFile:path];
   
     ThumbnailPDF *thumbPDF = [[ThumbnailPDF alloc] init];
-    _imageView.image = [UIImage imageWithCGImage:[thumbPDF thumbnailFromData:data andSize:500 andPageIndex:0]];
+    [thumbPDF startWithCompletionHandler:data andSize:500 completion:^(ThumbnailPDF *ThumbnailPDF, BOOL finished) {
+        if (finished) {
+            _imageView.image = [UIImage imageWithCGImage:ThumbnailPDF.myThumbnailImage];
+        }
+    }];
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

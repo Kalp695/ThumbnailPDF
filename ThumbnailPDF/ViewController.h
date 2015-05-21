@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+typedef void (^CompletionHandler)(BOOL);
+
 @interface ViewController : UIViewController
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
-
 
 
 @end
