@@ -15,9 +15,9 @@ typedef void (^completionHandler)(ThumbnailPDF * ThumbnailPDF, BOOL finished);
 
 @interface ThumbnailPDF : NSObject
 
-@property (nonatomic, strong) NSURL  *baseURL;
-@property (nonatomic, strong) NSData *data;
-@property (nonatomic, assign) CGImageRef myThumbnailImage;
+@property (nonatomic, strong) NSURL         *baseURL;
+@property (nonatomic, strong) NSData        *data;
+@property (nonatomic, assign) CGImageRef    myThumbnailImage;
 
 @property (nonatomic, assign) int     imageSize;
 @property (nonatomic, assign) int     indexPage;
